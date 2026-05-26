@@ -3,6 +3,15 @@
 <html class="dark" lang="en"><head>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <meta name="theme-color" content="#0a0e1a" />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Tam Nguyen (Ray) — Software Engineering" />
+    <meta property="og:description" content="Final-year Software Engineering student focused on Web, DevOps, and Game Development. Powered by passion, funded by your job offers." />
+    <meta property="og:image" content="/screen.png" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Tam Nguyen (Ray) — Software Engineering" />
+    <meta name="twitter:description" content="Final-year Software Engineering student focused on Web, DevOps, and Game Development." />
+    <meta name="twitter:image" content="/screen.png" />
 <title>Tam Nguyen | Software Engineering, Web, DevOps &amp; Game Development</title>
 <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
@@ -205,6 +214,20 @@
 <button class="md:hidden text-primary">
 <span class="material-symbols-outlined">menu</span>
 </button>
+</div>
+<!-- Mobile menu (hidden by default) -->
+<div id="mobile-menu" class="fixed inset-0 z-40 hidden bg-[#071022]/95 backdrop-blur-sm p-6">
+    <div class="flex items-center justify-between mb-6">
+        <div class="text-xl font-headline font-semibold text-primary">Tam Nguyen</div>
+        <button id="mobile-menu-close" class="text-on-surface-variant">Close</button>
+    </div>
+    <div class="flex flex-col gap-4 mt-6">
+        <a class="text-on-surface-variant text-lg" href="#tech-stack">Tech Stack</a>
+        <a class="text-on-surface-variant text-lg" href="#projects">Projects</a>
+        <a class="text-on-surface-variant text-lg" href="#experience">Experience</a>
+        <a class="text-on-surface-variant text-lg" href="#contact">Contact</a>
+        <a class="mt-4 inline-block px-6 py-3 bg-primary text-on-primary rounded-xl" href="mailto:tamnguyen.engineer.work@gmail.com">Email</a>
+    </div>
 </div>
 </nav>
 <main class="relative pt-16">
@@ -663,6 +686,23 @@
             closeCertificateModal();
         }
     });
+
+    // Mobile menu toggle
+    const mobileMenu = document.getElementById('mobile-menu');
+    const mobileMenuClose = document.getElementById('mobile-menu-close');
+    const mobileMenuButton = document.querySelector('button.md\:hidden');
+    if (mobileMenuButton) {
+        mobileMenuButton.addEventListener('click', () => {
+            mobileMenu.classList.remove('hidden');
+            mobileMenu.classList.add('flex');
+        });
+    }
+    if (mobileMenuClose) {
+        mobileMenuClose.addEventListener('click', () => {
+            mobileMenu.classList.add('hidden');
+            mobileMenu.classList.remove('flex');
+        });
+    }
 
     // Interactive Ice Particle System Logic
     const canvas = document.getElementById('ice-particles-canvas');
