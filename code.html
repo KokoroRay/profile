@@ -1,0 +1,766 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>GLACIER.IO | Backend &amp; DevOps Engineer</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "primary": "#7dd3fc",
+                        "outline": "#4a6070",
+                        "primary-container": "#0e4d6e",
+                        "on-primary": "#001f2e",
+                        "surface-container-high": "#1a2438",
+                        "tertiary-container": "#3d2060",
+                        "inverse-on-surface": "#0a0e1a",
+                        "on-primary-fixed": "#001f2e",
+                        "on-surface-variant": "#a0b4c4",
+                        "on-surface": "#e0e8f0",
+                        "on-secondary-fixed": "#0d1f2b",
+                        "error": "#ff6b6b",
+                        "tertiary": "#c8a0f0",
+                        "on-background": "#e0e8f0",
+                        "surface-dim": "#0f1524",
+                        "surface-bright": "#1a2438",
+                        "secondary": "#88b4cc",
+                        "on-tertiary-fixed": "#1a002e",
+                        "surface-tint": "#7dd3fc",
+                        "primary-fixed": "#c8eaff",
+                        "surface-container-low": "#111828",
+                        "tertiary-fixed": "#e8d0ff",
+                        "on-tertiary-container": "#e8d0ff",
+                        "on-primary-container": "#c8eaff",
+                        "surface-container": "#141c2e",
+                        "on-secondary-container": "#c0d8e8",
+                        "error-container": "#3d1414",
+                        "outline-variant": "#2a3a48",
+                        "surface": "#0f1524",
+                        "secondary-fixed-dim": "#88b4cc",
+                        "on-tertiary-fixed-variant": "#4d2a73",
+                        "on-primary-fixed-variant": "#004d73",
+                        "surface-variant": "#1a2438",
+                        "inverse-surface": "#e0e8f0",
+                        "tertiary-fixed-dim": "#c8a0f0",
+                        "on-tertiary": "#1a002e",
+                        "background": "#0a0e1a",
+                        "on-error-container": "#ffb3b3",
+                        "surface-container-highest": "#202c42",
+                        "on-error": "#1a0000",
+                        "inverse-primary": "#0a4c6e",
+                        "surface-container-lowest": "#0a0e1a",
+                        "secondary-container": "#1a3a4e",
+                        "on-secondary-fixed-variant": "#2a4a5e",
+                        "primary-fixed-dim": "#7dd3fc",
+                        "on-secondary": "#001f2e",
+                        "secondary-fixed": "#c0d8e8"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.5rem",
+                        "lg": "1rem",
+                        "xl": "1.5rem",
+                        "full": "9999px"
+                    },
+                    "fontFamily": {
+                        "headline": ["Inter"],
+                        "display": ["Inter"],
+                        "body": ["Inter"],
+                        "label": ["Inter"]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        html {
+            scroll-behavior: smooth;
+        }
+        body {
+            background-color: #0a0e1a;
+            color: #e0e8f0;
+            font-family: 'Inter', sans-serif;
+            overflow-x: hidden;
+            position: relative;
+        }
+        .glass-card {
+            background: rgba(15, 21, 36, 0.6);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(125, 211, 252, 0.1);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            z-index: 10;
+        }
+        /* Spotlight Effect Styles */
+        .spotlight-card::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(
+                circle at var(--mouse-x, 50%) var(--mouse-y, 50%),
+                rgba(125, 211, 252, 0.12) 0%,
+                transparent 50%
+            );
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            pointer-events: none;
+            z-index: 0;
+        }
+        .spotlight-card:hover::before {
+            opacity: 1;
+        }
+
+        /* Interactive Ice Particle System Canvas */
+        #ice-particles-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1; /* Behind content (z-index 10+), in front of background decor (-z-10) */
+            opacity: 0.8;
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .spotlight-card::before {
+                transition: none;
+                display: none;
+            }
+            .glass-card, .glass-card-elevated, .reveal {
+                transition: none !important;
+                transform: none !important;
+                animation: none !important;
+            }
+            #ice-particles-canvas {
+                display: none;
+            }
+        }
+        .glass-card:hover {
+            border-color: rgba(125, 211, 252, 0.3);
+            background: rgba(15, 21, 36, 0.7);
+        }
+        .glass-card-elevated {
+            background: rgba(15, 21, 36, 0.75);
+            backdrop-filter: blur(24px);
+            border: 1px solid rgba(125, 211, 252, 0.15);
+            transition: all 0.3s ease;
+            z-index: 10;
+        }
+        .glass-card-elevated:hover {
+            border-color: rgba(125, 211, 252, 0.4);
+            transform: translateY(-2px);
+        }
+        .text-glow {
+            text-shadow: 0 0 10px rgba(125, 211, 252, 0.4);
+        }
+        .terminal-cursor::after {
+            content: '|';
+            animation: blink 1s step-end infinite;
+        }
+        @keyframes blink {
+            from, to { opacity: 1; }
+            50% { opacity: 0; }
+        }
+        .grid-mesh {
+            background-image: radial-gradient(circle at 2px 2px, rgba(125, 211, 252, 0.05) 1px, transparent 0);
+            background-size: 40px 40px;
+        }
+        /* Reveal animation styles */
+        .reveal {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+        }
+        .reveal.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        section[id] {
+            scroll-margin-top: 6.5rem;
+        }
+    </style>
+</head>
+<body class="bg-background selection:bg-primary/30">
+<canvas id="ice-particles-canvas"></canvas>
+<!-- TopNavBar -->
+<nav class="fixed top-0 left-0 right-0 z-50 bg-[#0f1524]/60 backdrop-blur-lg border-b border-primary/10 shadow-[0_0_30px_rgba(125,211,252,0.05)]">
+<div class="flex justify-between items-center max-w-7xl mx-auto px-6 h-16">
+<div class="text-xl font-headline font-semibold tracking-wider text-primary">GLACIER.IO</div>
+<div class="hidden md:flex gap-8 items-center font-body tracking-tight">
+<a class="text-on-surface-variant hover:text-on-surface transition-colors" href="#tech-stack">Tech Stack</a>
+<a class="text-on-surface-variant hover:text-on-surface transition-colors" href="#projects">Projects</a>
+<a class="text-on-surface-variant hover:text-on-surface transition-colors" href="#experience">Experience</a>
+<a class="text-on-surface-variant hover:text-on-surface transition-colors" href="#contact">Contact</a>
+<a class="bg-primary/10 border border-primary/20 text-primary px-4 py-1.5 rounded-full hover:bg-primary/20 transition-all duration-300" href="#contact">
+                Resume
+            </a>
+</div>
+<button class="md:hidden text-primary">
+<span class="material-symbols-outlined">menu</span>
+</button>
+</div>
+</nav>
+<main class="relative pt-16">
+<!-- Background Decor -->
+<div class="absolute top-0 left-1/2 -translate-x-1/2 w-full h-[600px] bg-gradient-to-b from-primary/5 to-transparent pointer-events-none -z-10"></div>
+<div class="absolute top-40 right-[-10%] w-[500px] h-[500px] bg-tertiary/5 blur-[120px] rounded-full pointer-events-none -z-10"></div>
+<!-- Hero Section -->
+<section class="max-w-7xl mx-auto px-6 py-24 md:py-32 flex flex-col items-center text-center reveal">
+<div class="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-primary/20 bg-primary/5 text-xs font-medium text-primary mb-6">
+<span class="w-2 h-2 rounded-full bg-primary animate-pulse"></span>
+            AVAILABLE FOR COLLABORATION
+        </div>
+<h1 class="text-5xl md:text-7xl lg:text-8xl font-bold tracking-tight mb-8 bg-gradient-to-b from-white to-on-surface-variant bg-clip-text text-transparent">
+            Building Scalable <br/> <span class="text-primary italic">Systems.</span>
+</h1>
+<!-- Terminal Component -->
+<div class="w-full max-w-2xl glass-card rounded-xl p-6 text-left border-l-4 border-l-primary/50 overflow-hidden relative mb-20">
+<div class="flex gap-1.5 mb-4">
+<div class="w-2.5 h-2.5 rounded-full bg-red-500/50"></div>
+<div class="w-2.5 h-2.5 rounded-full bg-yellow-500/50"></div>
+<div class="w-2.5 h-2.5 rounded-full bg-green-500/50"></div>
+</div>
+<div class="font-mono text-sm md:text-base space-y-1 text-on-surface-variant">
+<p class="text-primary/70">$ glacier status check --all</p>
+<p class="text-on-surface">Initializing system kernels...</p>
+<p class="text-on-surface">[OK] Deployment Pipeline: <span class="text-green-400">Stable</span></p>
+<p class="text-on-surface">[OK] Kubernetes Clusters: <span class="text-green-400">12 Nodes Online</span></p>
+<p class="text-on-surface">[OK] Latency Monitoring: <span class="text-primary">12ms Global Avg</span></p>
+<p class="text-primary/90 mt-4 terminal-cursor">Waiting for input</p>
+</div>
+<div class="absolute -right-4 -bottom-4 opacity-10">
+<span class="material-symbols-outlined text-[120px]" style="font-variation-settings: 'FILL' 1;">terminal</span>
+</div>
+</div>
+<!-- System Lifecycle Visualization -->
+<div class="w-full max-w-4xl px-4">
+<h2 class="text-xs font-bold tracking-[0.3em] uppercase text-on-surface-variant/60 mb-12">System Lifecycle</h2>
+<div class="relative grid grid-cols-2 md:grid-cols-4 gap-8 md:gap-4 items-center">
+<!-- Line background for desktop -->
+<div class="hidden md:block absolute top-1/2 left-0 w-full h-px bg-gradient-to-r from-transparent via-primary/20 to-transparent -translate-y-12"></div>
+<!-- Step 1: Code -->
+<div class="relative flex flex-col items-center group">
+<div class="w-16 h-16 md:w-20 md:h-20 rounded-2xl glass-card flex items-center justify-center mb-4 border-primary/20 group-hover:scale-105 group-hover:border-primary/50 transition-all duration-300">
+<span class="material-symbols-outlined text-3xl md:text-4xl text-primary" style="font-variation-settings: 'FILL' 1;">terminal</span>
+</div>
+<span class="text-sm font-bold tracking-wider text-on-surface group-hover:text-primary transition-colors">CODE</span>
+<span class="text-[10px] text-on-surface-variant uppercase mt-1">Git / IDE</span>
+</div>
+<!-- Step 2: Build -->
+<div class="relative flex flex-col items-center group">
+<div class="w-16 h-16 md:w-20 md:h-20 rounded-2xl glass-card flex items-center justify-center mb-4 border-primary/20 group-hover:scale-105 group-hover:border-primary/50 transition-all duration-300">
+<span class="material-symbols-outlined text-3xl md:text-4xl text-primary animate-[spin_8s_linear_infinite]">settings</span>
+</div>
+<span class="text-sm font-bold tracking-wider text-on-surface group-hover:text-primary transition-colors">BUILD</span>
+<span class="text-[10px] text-on-surface-variant uppercase mt-1">Artifacts</span>
+</div>
+<!-- Step 3: Deploy -->
+<div class="relative flex flex-col items-center group">
+<div class="w-16 h-16 md:w-20 md:h-20 rounded-2xl glass-card flex items-center justify-center mb-4 border-primary/20 group-hover:scale-105 group-hover:border-primary/50 transition-all duration-300">
+<span class="material-symbols-outlined text-3xl md:text-4xl text-primary">deployed_code</span>
+</div>
+<span class="text-sm font-bold tracking-wider text-on-surface group-hover:text-primary transition-colors">DEPLOY</span>
+<span class="text-[10px] text-on-surface-variant uppercase mt-1">CI / CD</span>
+</div>
+<!-- Step 4: Cloud/Monitor -->
+<div class="relative flex flex-col items-center group">
+<div class="w-16 h-16 md:w-20 md:h-20 rounded-2xl glass-card flex items-center justify-center mb-4 border-primary/20 group-hover:scale-105 group-hover:border-primary/50 transition-all duration-300">
+<span class="material-symbols-outlined text-3xl md:text-4xl text-primary">cloud_done</span>
+</div>
+<span class="text-sm font-bold tracking-wider text-on-surface group-hover:text-primary transition-colors">MONITOR</span>
+<span class="text-[10px] text-on-surface-variant uppercase mt-1">Global/HA</span>
+</div>
+</div>
+</div>
+</section>
+<!-- Tech Stack Section (Bento Grid) -->
+<section class="max-w-7xl mx-auto px-6 py-20 grid-mesh" id="tech-stack">
+<div class="grid grid-cols-1 md:grid-cols-12 gap-4">
+<!-- Core Expertise / Languages -->
+<div class="md:col-span-8 glass-card spotlight-card rounded-3xl p-8 flex flex-col justify-between group reveal">
+<div class="relative z-10">
+<div class="flex justify-between items-start mb-6">
+<div>
+<h3 class="text-2xl font-bold mb-2">Core Expertise</h3>
+<p class="text-on-surface-variant leading-relaxed max-w-md">Mastering the backbone of modern infrastructure. Focused on high-concurrency systems and resilient architectures.</p>
+</div>
+<div class="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center text-primary">
+<span class="material-symbols-outlined text-3xl">code</span>
+</div>
+</div>
+<div class="grid grid-cols-2 sm:grid-cols-3 gap-4">
+<div class="flex items-center gap-3 p-4 rounded-2xl bg-white/5 border border-white/10 hover:bg-white/10 transition-colors">
+<span class="material-symbols-outlined text-primary">coffee</span>
+<div>
+<p class="font-bold text-sm">Java</p>
+<p class="text-[10px] text-on-surface-variant uppercase tracking-tighter">Spring Boot</p>
+</div>
+</div>
+<div class="flex items-center gap-3 p-4 rounded-2xl bg-white/5 border border-white/10 hover:bg-white/10 transition-colors">
+<span class="material-symbols-outlined text-primary">terminal</span>
+<div>
+<p class="font-bold text-sm">C#</p>
+<p class="text-[10px] text-on-surface-variant uppercase tracking-tighter">.NET Ecosystem</p>
+</div>
+</div>
+<div class="flex items-center gap-3 p-4 rounded-2xl bg-white/5 border border-white/10 hover:bg-white/10 transition-colors">
+<span class="material-symbols-outlined text-primary">rocket</span>
+<div>
+<p class="font-bold text-sm">Go</p>
+<p class="text-[10px] text-on-surface-variant uppercase tracking-tighter">Microservices</p>
+</div>
+</div>
+<div class="flex items-center gap-3 p-4 rounded-2xl bg-white/5 border border-white/10 hover:bg-white/10 transition-colors">
+<span class="material-symbols-outlined text-primary">language</span>
+<div>
+<p class="font-bold text-sm">Web Stack</p>
+<p class="text-[10px] text-on-surface-variant uppercase tracking-tighter">HTML/CSS/JS</p>
+</div>
+</div>
+<div class="flex items-center gap-3 p-4 rounded-2xl bg-white/5 border border-white/10 hover:bg-white/10 transition-colors">
+<span class="material-symbols-outlined text-primary">smartphone</span>
+<div>
+<p class="font-bold text-sm">Flutter</p>
+<p class="text-[10px] text-on-surface-variant uppercase tracking-tighter">Mobile &amp; Web</p>
+</div>
+</div>
+<div class="flex items-center gap-3 p-4 rounded-2xl bg-white/5 border border-white/10 hover:bg-white/10 transition-colors">
+<span class="material-symbols-outlined text-primary">architecture</span>
+<div>
+<p class="font-bold text-sm">Dart</p>
+<p class="text-[10px] text-on-surface-variant uppercase tracking-tighter">Type-Safe</p>
+</div>
+</div>
+</div>
+</div>
+<div class="absolute -right-20 -bottom-20 w-64 h-64 bg-primary/5 rounded-full blur-3xl group-hover:bg-primary/10 transition-all"></div>
+</div>
+<!-- Cloud & Certs -->
+<div class="md:col-span-4 glass-card spotlight-card rounded-3xl p-8 flex flex-col justify-between reveal">
+<div class="relative z-10">
+<div class="w-10 h-10 rounded-lg bg-tertiary/10 flex items-center justify-center text-tertiary mb-4">
+<span class="material-symbols-outlined">cloud</span>
+</div>
+<h3 class="text-xl font-bold mb-1">Cloud Ecosystem</h3>
+<p class="text-sm text-on-surface-variant mb-6">Scalable global infrastructure.</p>
+<div class="space-y-3">
+<div class="flex items-center justify-between gap-3 p-3 rounded-xl bg-white/5 border border-white/10">
+<span class="font-medium">AWS</span>
+<button class="text-[10px] bg-tertiary/20 text-tertiary px-2 py-0.5 rounded-full font-bold hover:bg-tertiary/30 transition-colors" type="button" data-certificate-open>
+                        DVA CERTIFIED
+                    </button>
+</div>
+<div class="flex flex-wrap gap-2">
+<span class="px-2 py-1 text-[10px] rounded-lg bg-white/5 border border-white/10 text-on-surface-variant">Azure</span>
+<span class="px-2 py-1 text-[10px] rounded-lg bg-white/5 border border-white/10 text-on-surface-variant">GCP</span>
+<span class="px-2 py-1 text-[10px] rounded-lg bg-white/5 border border-white/10 text-on-surface-variant">Cloudflare</span>
+<span class="px-2 py-1 text-[10px] rounded-lg bg-white/5 border border-white/10 text-on-surface-variant">DigitalOcean</span>
+</div>
+</div>
+</div>
+</div>
+<!-- DevOps & Tools -->
+<div class="md:col-span-7 glass-card spotlight-card rounded-3xl p-8 reveal">
+<div class="relative z-10">
+<div class="flex items-center gap-3 mb-6">
+<div class="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center text-primary">
+<span class="material-symbols-outlined">settings_suggest</span>
+</div>
+<h3 class="text-xl font-bold">DevOps &amp; Automation</h3>
+</div>
+<div class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-5 gap-3">
+<div class="flex flex-col items-center gap-1 p-2 rounded-xl bg-white/5 border border-white/5 hover:bg-white/10 transition-colors text-center aspect-square justify-center">
+<span class="material-symbols-outlined text-primary text-xl">box</span>
+<span class="text-[10px] font-medium">Docker</span>
+</div>
+<div class="flex flex-col items-center gap-1 p-2 rounded-xl bg-white/5 border border-white/5 hover:bg-white/10 transition-colors text-center aspect-square justify-center">
+<span class="material-symbols-outlined text-primary text-xl">hub</span>
+<span class="text-[10px] font-medium">Kubernetes</span>
+</div>
+<div class="flex flex-col items-center gap-1 p-2 rounded-xl bg-white/5 border border-white/5 hover:bg-white/10 transition-colors text-center aspect-square justify-center">
+<span class="material-symbols-outlined text-primary text-xl">sync_alt</span>
+<span class="text-[10px] font-medium">CI/CD</span>
+</div>
+<div class="flex flex-col items-center gap-1 p-2 rounded-xl bg-white/5 border border-white/5 hover:bg-white/10 transition-colors text-center aspect-square justify-center">
+<span class="material-symbols-outlined text-primary text-xl">rebase_edit</span>
+<span class="text-[10px] font-medium">Jenkins</span>
+</div>
+<div class="flex flex-col items-center gap-1 p-2 rounded-xl bg-white/5 border border-white/5 hover:bg-white/10 transition-colors text-center aspect-square justify-center">
+<span class="material-symbols-outlined text-primary text-xl">stream</span>
+<span class="text-[10px] font-medium">Kafka</span>
+</div>
+<div class="flex flex-col items-center gap-1 p-2 rounded-xl bg-white/5 border border-white/5 hover:bg-white/10 transition-colors text-center aspect-square justify-center">
+<span class="material-symbols-outlined text-primary text-xl">bolt</span>
+<span class="text-[10px] font-medium">n8n</span>
+</div>
+<div class="flex flex-col items-center gap-1 p-2 rounded-xl bg-white/5 border border-white/5 hover:bg-white/10 transition-colors text-center aspect-square justify-center">
+<span class="material-symbols-outlined text-primary text-xl">terminal</span>
+<span class="text-[10px] font-medium">GitHub Act.</span>
+</div>
+<div class="flex flex-col items-center gap-1 p-2 rounded-xl bg-white/5 border border-white/5 hover:bg-white/10 transition-colors text-center aspect-square justify-center">
+<span class="material-symbols-outlined text-primary text-xl">all_inclusive</span>
+<span class="text-[10px] font-medium">GitLab CI</span>
+</div>
+<div class="flex flex-col items-center gap-1 p-2 rounded-xl bg-white/5 border border-white/5 hover:bg-white/10 transition-colors text-center aspect-square justify-center">
+<span class="material-symbols-outlined text-primary text-xl">sync</span>
+<span class="text-[10px] font-medium">ArgoCD</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Databases -->
+<div class="md:col-span-5 glass-card spotlight-card rounded-3xl p-8 reveal">
+<div class="relative z-10">
+<div class="flex items-center gap-3 mb-6">
+<div class="w-10 h-10 rounded-lg bg-secondary/10 flex items-center justify-center text-secondary">
+<span class="material-symbols-outlined">database</span>
+</div>
+<h3 class="text-xl font-bold">Databases</h3>
+</div>
+<div class="space-y-4">
+<div>
+<p class="text-[10px] text-on-surface-variant uppercase tracking-widest mb-2">Relational &amp; NoSQL</p>
+<div class="flex flex-wrap gap-2">
+<span class="px-3 py-1.5 rounded-xl bg-white/5 border border-white/10 text-xs">SQL Server</span>
+<span class="px-3 py-1.5 rounded-xl bg-white/5 border border-white/10 text-xs">MySQL</span>
+<span class="px-3 py-1.5 rounded-xl bg-white/5 border border-white/10 text-xs">PostgreSQL</span>
+<span class="px-3 py-1.5 rounded-xl bg-white/5 border border-white/10 text-xs">MongoDB</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Projects Section -->
+<section class="max-w-7xl mx-auto px-6 py-20 reveal" id="projects">
+<div class="flex flex-col md:flex-row md:items-end justify-between mb-12 gap-4">
+<div>
+<h2 class="text-3xl font-bold mb-2">Featured Projects</h2>
+<p class="text-on-surface-variant">Architecting reliability from the ground up. These cards can be synced from your pinned GitHub repositories with a small API or workflow layer.</p>
+</div>
+<a class="text-primary flex items-center gap-2 hover:underline text-sm" href="https://github.com/KokoroRay?tab=repositories" target="_blank" rel="noopener noreferrer">
+                View GitHub Repository <span class="material-symbols-outlined text-base">arrow_forward</span>
+</a>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+<!-- Project 1 -->
+<div class="glass-card-elevated rounded-3xl overflow-hidden group">
+<div class="relative h-64 overflow-hidden">
+<img alt="Server infrastructure" class="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-500" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBiWkB6yY3AREtSQD1-sTN0e4PJ6HKrZuZfF_5UV0cIOGv2RD28_lneGwUMoH6DJ-Pflaqvvs8ju8QHMvkIkm_MWm8wJE4NEibBEGAY5KkXEXCauNF_inTygGN0hpxzqVk46bMsEqMncnF_3X-fPcKFDXNzGs2F9EeSdzsHVxwnz_CG_jDupofB2BlpLAaK_gq1dc7z2lnLvzKJ0OKsfkJzqjezEhRYteFaXXFkyz54pd0v60cBVDgqfjW89gDSn7czNmtuLb8qS8E"/>
+<div class="absolute inset-0 bg-gradient-to-t from-surface-dim to-transparent"></div>
+<div class="absolute bottom-6 left-6 flex gap-2">
+<span class="px-3 py-1 rounded-full bg-primary/20 backdrop-blur-md text-primary text-[10px] font-bold uppercase">Go</span>
+<span class="px-3 py-1 rounded-full bg-primary/20 backdrop-blur-md text-primary text-[10px] font-bold uppercase">Redis</span>
+<span class="px-3 py-1 rounded-full bg-primary/20 backdrop-blur-md text-primary text-[10px] font-bold uppercase">gRPC</span>
+</div>
+</div>
+<div class="p-8">
+<h3 class="text-xl font-bold mb-3">Microservices Backend</h3>
+<p class="text-on-surface-variant text-sm leading-relaxed mb-6">A high-throughput distributed system designed for real-time data processing. Features gRPC communication, Redis caching, and horizontal scaling capabilities.</p>
+<div class="flex items-center gap-4">
+<button class="flex items-center gap-2 px-4 py-2 bg-primary text-on-primary rounded-xl font-bold text-sm hover:brightness-110 transition-all">
+<span class="material-symbols-outlined text-lg">visibility</span>
+                            Case Study
+                        </button>
+<button class="w-10 h-10 flex items-center justify-center border border-outline rounded-xl hover:bg-white/5 transition-colors">
+<span class="material-symbols-outlined">link</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Project 2 -->
+<div class="glass-card-elevated rounded-3xl overflow-hidden group">
+<div class="relative h-64 overflow-hidden">
+<img alt="Code on screen" class="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-500" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC7BdHeAhXGJqRKj4edUq1BrO7l4tamJ0RZG2jKQb7l5ODtbSS8kpQtNnRJ69nppgr9KeQE357pC4ZxGMRtJR-HLFBhj1sMFORWp9S1pzaSo-oMDffiRtoxZeBQuTtmbWZQ4MDd4oQWoftZ97fB2_ZXXjOHSL9YBpBSFe4odzKv-3YIiNrxbrG84wpg9-cc0RAotYbCezW-cH6uhhZCgE_kwdl0VCpCc9Fq4PwIKxUrNTG-1Ja6sDLAwi4fceo6sLy3HHvUTvZVYZQ"/>
+<div class="absolute inset-0 bg-gradient-to-t from-surface-dim to-transparent"></div>
+<div class="absolute bottom-6 left-6 flex gap-2">
+<span class="px-3 py-1 rounded-full bg-tertiary/20 backdrop-blur-md text-tertiary text-[10px] font-bold uppercase">Terraform</span>
+<span class="px-3 py-1 rounded-full bg-tertiary/20 backdrop-blur-md text-tertiary text-[10px] font-bold uppercase">AWS</span>
+<span class="px-3 py-1 rounded-full bg-tertiary/20 backdrop-blur-md text-tertiary text-[10px] font-bold uppercase">Ansible</span>
+</div>
+</div>
+<div class="p-8">
+<h3 class="text-xl font-bold mb-3">Infrastructure as Code</h3>
+<p class="text-on-surface-variant text-sm leading-relaxed mb-6">Fully automated cloud provisioning using Terraform. Multi-region disaster recovery and auto-scaling groups for enterprise-level availability.</p>
+<div class="flex items-center gap-4">
+<button class="flex items-center gap-2 px-4 py-2 bg-primary text-on-primary rounded-xl font-bold text-sm hover:brightness-110 transition-all">
+<span class="material-symbols-outlined text-lg">visibility</span>
+                            Case Study
+                        </button>
+<button class="w-10 h-10 flex items-center justify-center border border-outline rounded-xl hover:bg-white/5 transition-colors">
+<span class="material-symbols-outlined">link</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Experience Section -->
+<section class="max-w-4xl mx-auto px-6 py-20 reveal" id="experience">
+<h2 class="text-3xl font-bold mb-12 text-center">Journey &amp; Growth</h2>
+<div class="relative space-y-12">
+<div class="absolute left-0 md:left-1/2 md:-translate-x-1/2 top-0 bottom-0 w-px bg-gradient-to-b from-primary/50 via-outline/20 to-transparent"></div>
+<!-- Item 1 -->
+<div class="relative flex flex-col md:flex-row gap-8 md:items-center group">
+<div class="hidden md:block flex-1 text-right">
+<p class="text-primary font-bold">2023 - Present</p>
+<p class="text-sm text-on-surface-variant">Cloud Solutions Associate</p>
+</div>
+<div class="absolute left-[-5px] md:left-1/2 md:-translate-x-1/2 w-2.5 h-2.5 rounded-full bg-primary shadow-[0_0_10px_#7dd3fc]"></div>
+<div class="flex-1 glass-card p-6 rounded-2xl md:ml-4">
+<div class="md:hidden mb-2">
+<p class="text-primary font-bold">2023 - Present</p>
+</div>
+<h4 class="font-bold">Junior DevOps Engineer</h4>
+<p class="text-sm text-on-surface-variant mt-2 leading-relaxed">Implementing CI/CD pipelines and managing Kubernetes clusters for high-availability production environments.</p>
+</div>
+</div>
+<!-- Item 2 -->
+<div class="relative flex flex-col md:flex-row-reverse gap-8 md:items-center group">
+<div class="hidden md:block flex-1 text-left">
+<p class="text-primary font-bold">2022 - 2023</p>
+<p class="text-sm text-on-surface-variant">Back-end Intern</p>
+</div>
+<div class="absolute left-[-5px] md:left-1/2 md:-translate-x-1/2 w-2.5 h-2.5 rounded-full bg-outline-variant"></div>
+<div class="flex-1 glass-card p-6 rounded-2xl md:mr-4">
+<div class="md:hidden mb-2">
+<p class="text-primary font-bold">2022 - 2023</p>
+</div>
+<h4 class="font-bold">Software Development Internship</h4>
+<p class="text-sm text-on-surface-variant mt-2 leading-relaxed">Assisted in developing RESTful APIs using Go and Java. Optimized database queries resulting in a 15% performance boost.</p>
+</div>
+</div>
+<!-- Item 3 -->
+<div class="relative flex flex-col md:flex-row gap-8 md:items-center group">
+<div class="hidden md:block flex-1 text-right">
+<p class="text-primary font-bold">2021</p>
+<p class="text-sm text-on-surface-variant">B.S. in Computer Science</p>
+</div>
+<div class="absolute left-[-5px] md:left-1/2 md:-translate-x-1/2 w-2.5 h-2.5 rounded-full bg-outline-variant"></div>
+<div class="flex-1 glass-card p-6 rounded-2xl md:ml-4">
+<div class="md:hidden mb-2">
+<p class="text-primary font-bold">2021</p>
+</div>
+<h4 class="font-bold">Academic Foundation</h4>
+<p class="text-sm text-on-surface-variant mt-2 leading-relaxed">Focus on Distributed Systems, OS Architecture, and Network Security at the University of Tech.</p>
+</div>
+</div>
+</div>
+</section>
+<!-- CTA Section -->
+<section class="max-w-7xl mx-auto px-6 py-32 reveal" id="contact">
+<div class="glass-card rounded-[40px] p-12 md:p-24 text-center relative overflow-hidden">
+<div class="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-primary/10 via-transparent to-tertiary/10 pointer-events-none"></div>
+<h2 class="text-4xl md:text-6xl font-black mb-8 relative z-10">Let's build the <span class="text-primary">future</span> together.</h2>
+<p class="text-on-surface-variant max-w-2xl mx-auto mb-10 relative z-10 text-lg">Currently open to freelance DevOps architecture consulting or full-time opportunities in high-growth engineering teams.</p>
+<div class="flex flex-col sm:flex-row items-center justify-center gap-4 relative z-10">
+<a class="w-full sm:w-auto px-8 py-4 bg-primary text-on-primary font-bold rounded-2xl hover:brightness-110 transition-all" href="mailto:hello@glacier.io">
+                    Send an Email
+                </a>
+<a class="w-full sm:w-auto px-8 py-4 bg-white/5 border border-white/10 font-bold rounded-2xl hover:bg-white/10 transition-colors" href="#">
+                    Book a Call
+                </a>
+</div>
+</div>
+</section>
+</main>
+<!-- Footer -->
+<footer class="w-full py-12 border-t border-outline-variant/20">
+<div class="flex flex-col md:flex-row justify-between items-center max-w-7xl mx-auto px-8 gap-4 font-body text-sm">
+<div class="text-lg font-headline font-bold text-on-surface">GLACIER.IO</div>
+<div class="flex gap-8 items-center">
+<a class="text-on-surface-variant hover:text-primary transition-colors" href="https://github.com/KokoroRay?tab=repositories" target="_blank" rel="noopener noreferrer">GitHub</a>
+<a class="text-on-surface-variant hover:text-primary transition-colors" href="#">LinkedIn</a>
+<a class="text-on-surface-variant hover:text-primary transition-colors" href="#">Documentation</a>
+</div>
+<p class="text-on-surface-variant">© 2024 Glacier DevOps. Built with Go &amp; Kubernetes.</p>
+</div>
+</footer>
+<div class="fixed inset-0 z-[60] hidden items-center justify-center bg-[#050814]/80 px-4" id="certificate-modal" aria-hidden="true">
+<div class="relative w-full max-w-5xl overflow-hidden rounded-3xl border border-white/10 bg-[#0f1524] shadow-2xl">
+<button class="absolute right-4 top-4 z-10 rounded-full bg-black/40 px-3 py-2 text-sm text-white hover:bg-black/60 transition-colors" type="button" data-certificate-close>
+                Close
+            </button>
+<div class="grid gap-0 md:grid-cols-[1.2fr_0.8fr]">
+<div class="bg-black/20 p-4 md:p-6">
+<img alt="AWS Certified Developer - Associate certificate" class="max-h-[80vh] w-full rounded-2xl object-contain bg-black" src="./AWS%20Certified%20Developer%20-%20Associate%20certificate_page-0001.jpg"/>
+</div>
+<div class="flex flex-col justify-between gap-6 p-6 md:p-8 border-t border-white/10 md:border-t-0 md:border-l">
+<div>
+<p class="text-xs uppercase tracking-[0.3em] text-primary mb-3">Certification</p>
+<h3 class="text-2xl font-bold mb-4">AWS Certified Developer - Associate</h3>
+<p class="text-sm text-on-surface-variant leading-relaxed">Bấm vào nút DVA CERTIFIED để mở chứng chỉ trực tiếp ngay trên trang.</p>
+</div>
+<div class="text-xs text-on-surface-variant">File: AWS Certified Developer - Associate certificate_page-0001.jpg</div>
+</div>
+</div>
+</div>
+</div>
+<script>
+    // Intersection observer for reveal animations
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('active');
+            }
+        });
+    }, { threshold: 0.1 });
+
+    document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+    // Mouse Spotlight Effect Logic
+    const spotlightCards = document.querySelectorAll('.spotlight-card');
+    
+    if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        spotlightCards.forEach(card => {
+            card.addEventListener('mousemove', (e) => {
+                const rect = card.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+                
+                card.style.setProperty('--mouse-x', `${x}px`);
+                card.style.setProperty('--mouse-y', `${y}px`);
+            });
+        });
+    }
+
+    // Certificate modal
+    const certificateModal = document.getElementById('certificate-modal');
+    const openCertificateButtons = document.querySelectorAll('[data-certificate-open]');
+    const closeCertificateButtons = document.querySelectorAll('[data-certificate-close]');
+
+    function openCertificateModal() {
+        certificateModal.classList.remove('hidden');
+        certificateModal.classList.add('flex');
+        certificateModal.setAttribute('aria-hidden', 'false');
+    }
+
+    function closeCertificateModal() {
+        certificateModal.classList.add('hidden');
+        certificateModal.classList.remove('flex');
+        certificateModal.setAttribute('aria-hidden', 'true');
+    }
+
+    openCertificateButtons.forEach(button => button.addEventListener('click', openCertificateModal));
+    closeCertificateButtons.forEach(button => button.addEventListener('click', closeCertificateModal));
+    certificateModal.addEventListener('click', (event) => {
+        if (event.target === certificateModal) {
+            closeCertificateModal();
+        }
+    });
+    window.addEventListener('keydown', (event) => {
+        if (event.key === 'Escape' && !certificateModal.classList.contains('hidden')) {
+            closeCertificateModal();
+        }
+    });
+
+    // Interactive Ice Particle System Logic
+    const canvas = document.getElementById('ice-particles-canvas');
+    const ctx = canvas.getContext('2d');
+    
+    let particles = [];
+    let mouse = { x: null, y: null };
+    const PARTICLE_COUNT = 150;
+    const ICE_BLUE = '#7dd3fc';
+
+    function resize() {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+        initParticles();
+    }
+
+    class Particle {
+        constructor() {
+            this.init();
+        }
+
+        init() {
+            this.x = Math.random() * canvas.width;
+            this.y = Math.random() * canvas.height;
+            this.size = 1 + Math.random() * 1.5;
+            this.opacity = 0.1 + Math.random() * 0.3;
+            this.vx = (Math.random() - 0.5) * 0.3;
+            this.vy = (Math.random() - 0.5) * 0.3;
+            this.originOpacity = this.opacity;
+        }
+
+        update() {
+            // Drift
+            this.x += this.vx;
+            this.y += this.vy;
+
+            // Mouse Gravity Effect
+            if (mouse.x !== null) {
+                const dx = mouse.x - this.x;
+                const dy = mouse.y - this.y;
+                const distance = Math.sqrt(dx * dx + dy * dy);
+                const maxDistance = 300;
+
+                if (distance < maxDistance) {
+                    const force = (maxDistance - distance) / maxDistance;
+                    this.x += dx * force * 0.02;
+                    this.y += dy * force * 0.02;
+                    this.opacity = Math.min(0.6, this.originOpacity + force * 0.3);
+                } else {
+                    this.opacity = this.originOpacity;
+                }
+            }
+
+            // Boundary wrap
+            if (this.x < 0) this.x = canvas.width;
+            if (this.x > canvas.width) this.x = 0;
+            if (this.y < 0) this.y = canvas.height;
+            if (this.y > canvas.height) this.y = 0;
+        }
+
+        draw() {
+            ctx.beginPath();
+            ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+            ctx.fillStyle = ICE_BLUE;
+            ctx.globalAlpha = this.opacity;
+            ctx.fill();
+        }
+    }
+
+    function initParticles() {
+        particles = [];
+        for (let i = 0; i < PARTICLE_COUNT; i++) {
+            particles.push(new Particle());
+        }
+    }
+
+    function animate() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        
+        particles.forEach(p => {
+            p.update();
+            p.draw();
+        });
+        
+        requestAnimationFrame(animate);
+    }
+
+    window.addEventListener('resize', resize);
+    window.addEventListener('mousemove', (e) => {
+        mouse.x = e.clientX;
+        mouse.y = e.clientY;
+    });
+    window.addEventListener('mouseout', () => {
+        mouse.x = null;
+        mouse.y = null;
+    });
+
+    if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        resize();
+        animate();
+    }
+</script>
+</body></html>
