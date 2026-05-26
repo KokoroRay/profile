@@ -3,17 +3,6 @@
 <html class="dark" lang="en"><head>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-    <meta name="theme-color" content="#0a0e1a" />
-    <meta property="og:type" content="website" />
-    <meta property="og:title" content="Tam Nguyen (Ray) — Software Engineering" />
-    <meta property="og:description" content="Final-year Software Engineering student focused on Web, DevOps, and Game Development. Powered by passion, funded by your job offers." />
-    <meta property="og:image" content="/screen.png" />
-    <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="Tam Nguyen (Ray) — Software Engineering" />
-    <meta name="twitter:description" content="Final-year Software Engineering student focused on Web, DevOps, and Game Development." />
-    <meta name="twitter:image" content="/screen.png" />
-    <link rel="icon" type="image/svg+xml" href="./favicon.svg" />
-    <link rel="alternate icon" href="./favicon.svg" />
 <title>Tam Nguyen | Software Engineering, Web, DevOps &amp; Game Development</title>
 <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
@@ -202,8 +191,8 @@
             pointer-events: none;
             z-index: -20;
         }
-        .page-bg-decor .decor-blob { transform-origin: center; }
         .page-bg-decor .decor-blob {
+            transform-origin: center;
             animation: float 18s ease-in-out infinite alternate;
             will-change: transform, filter, opacity;
         }
@@ -710,23 +699,6 @@
         }
     });
 
-    // Mobile menu toggle
-    const mobileMenu = document.getElementById('mobile-menu');
-    const mobileMenuClose = document.getElementById('mobile-menu-close');
-    const mobileMenuButton = document.querySelector('button.md\:hidden');
-    if (mobileMenuButton) {
-        mobileMenuButton.addEventListener('click', () => {
-            mobileMenu.classList.remove('hidden');
-            mobileMenu.classList.add('flex');
-        });
-    }
-    if (mobileMenuClose) {
-        mobileMenuClose.addEventListener('click', () => {
-            mobileMenu.classList.add('hidden');
-            mobileMenu.classList.remove('flex');
-        });
-    }
-
     // Interactive Ice Particle System Logic
     const canvas = document.getElementById('ice-particles-canvas');
     const ctx = canvas.getContext('2d');
@@ -791,7 +763,6 @@
             ctx.beginPath();
             ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
             ctx.fillStyle = ICE_BLUE;
-            // subtle glow
             ctx.shadowBlur = Math.min(12, this.size * 6);
             ctx.shadowColor = ICE_BLUE;
             ctx.globalAlpha = this.opacity;
@@ -837,7 +808,7 @@
     (function decorateBlobsParallax(){
         const blobs = document.querySelectorAll('.page-bg-decor .decor-blob');
         if (!blobs || blobs.length === 0) return;
-        const strength = 0.02; // parallax strength
+        const strength = 0.02;
         window.addEventListener('mousemove', (e) => {
             const cx = window.innerWidth / 2;
             const cy = window.innerHeight / 2;
