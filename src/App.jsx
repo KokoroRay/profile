@@ -276,7 +276,7 @@ function App() {
         <div ref={blobTwoRef} className="absolute bottom-[-6%] left-[-15%] w-[420px] h-[420px] bg-primary/6 blur-[140px] rounded-full decor-blob" />
       </div>
 
-      <div className="min-h-screen bg-background text-on-surface selection:bg-primary/30 overflow-x-hidden relative">
+      <div className="min-h-screen bg-background text-on-surface selection:bg-primary/30 overflow-x-hidden relative app-root">
         <nav className="fixed top-0 left-0 right-0 z-50 bg-[#0f1524]/60 backdrop-blur-lg border-b border-primary/10 shadow-[0_0_30px_rgba(125,211,252,0.05)]">
           <div className="flex justify-between items-center max-w-7xl mx-auto px-6 h-16">
             <div className="text-xl font-headline font-semibold tracking-wider text-primary">Tam Nguyen</div>

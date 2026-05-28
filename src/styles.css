@@ -51,7 +51,7 @@ body {
 }
 
 .page-bg-decor {
-  position: absolute;
+  position: fixed;
   inset: 0;
   pointer-events: none;
   z-index: -20;
@@ -156,4 +156,10 @@ section[id] {
 .glass-card-elevated:hover {
   border-color: rgba(125, 211, 252, 0.4);
   transform: translateY(-2px);
+}
+
+/* Ensure main app content sits above the canvas */
+.app-root {
+  position: relative;
+  z-index: 10;
 }
