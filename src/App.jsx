@@ -270,13 +270,7 @@ function App() {
     <>
       <SectionReveal />
       <ParticleCanvas />
-      <div className="page-bg-decor" aria-hidden="true">
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-[600px] bg-gradient-to-b from-primary/5 to-transparent" />
-        <div ref={blobOneRef} className="absolute top-40 right-[-10%] w-[500px] h-[500px] bg-tertiary/5 blur-[120px] rounded-full decor-blob" />
-        <div ref={blobTwoRef} className="absolute bottom-[-6%] left-[-15%] w-[420px] h-[420px] bg-primary/6 blur-[140px] rounded-full decor-blob" />
-      </div>
-
-      <div className="min-h-screen bg-background text-on-surface selection:bg-primary/30 overflow-x-hidden relative app-root">
+      <div className="min-h-screen bg-background text-on-surface selection:bg-primary/30 overflow-x-hidden relative">
         <nav className="fixed top-0 left-0 right-0 z-50 bg-[#0f1524]/60 backdrop-blur-lg border-b border-primary/10 shadow-[0_0_30px_rgba(125,211,252,0.05)]">
           <div className="flex justify-between items-center max-w-7xl mx-auto px-6 h-16">
             <div className="text-xl font-headline font-semibold tracking-wider text-primary">Tam Nguyen</div>
@@ -315,7 +309,13 @@ function App() {
           </div>
         </nav>
 
-        <main className="relative isolate pt-16">
+        <main className="relative pt-16">
+          <div className="page-bg-decor" aria-hidden="true">
+            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-[600px] bg-gradient-to-b from-primary/5 to-transparent" />
+            <div ref={blobOneRef} className="absolute top-40 right-[-10%] w-[500px] h-[500px] bg-tertiary/5 blur-[120px] rounded-full decor-blob" />
+            <div ref={blobTwoRef} className="absolute bottom-[-6%] left-[-15%] w-[420px] h-[420px] bg-primary/6 blur-[140px] rounded-full decor-blob" />
+          </div>
+
           <section className="max-w-7xl mx-auto px-6 py-24 md:py-32 flex flex-col items-center text-center reveal">
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-primary/20 bg-primary/5 text-xs font-medium text-primary mb-6">
               <span className="w-2 h-2 rounded-full bg-primary animate-pulse" />
