@@ -33,7 +33,9 @@ jobs:
         run: npm run build
 
       - name: Prepare Pages output
-        run: touch dist/.nojekyll
+        run: |
+          touch dist/.nojekyll
+          echo "kokororay.io.vn" > dist/CNAME
 
       - name: Publish to gh-pages branch
         uses: peaceiris/actions-gh-pages@v4
@@ -41,6 +43,7 @@ jobs:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./dist
           publish_branch: gh-pages
+          cname: kokororay.io.vn
 
       - name: Show Pages URL
         run: |
